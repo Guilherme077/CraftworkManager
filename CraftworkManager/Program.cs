@@ -7,17 +7,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.  
 builder.Services.AddControllersWithViews();
-builder.Services.AddEntityFrameworkSqlServer().AddDbContext<DBContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("DataBase")));
+builder.Services.AddRazorPages();
+//builder.Services.AddEntityFrameworkSqlServer().AddDbContext<DBContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("DataBase")));
 
-builder.Services.AddDbContext<DBContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<DBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DataBase")));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DBContext>();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-{
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = true;
-}
-    ).AddEntityFrameworkStores<DBContext>().AddDefaultTokenProviders();
+//builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+//{
+//    options.Password.RequiredLength = 6;
+//    options.Password.RequireNonAlphanumeric = true;
+//}
+//    ).AddEntityFrameworkStores<DBContext>().AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -40,5 +41,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
    name: "default",
    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapRazorPages();
 
 app.Run();
