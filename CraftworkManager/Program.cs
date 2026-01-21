@@ -1,4 +1,5 @@
 using CraftworkManager.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,6 +8,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.  
 builder.Services.AddControllersWithViews();
 builder.Services.AddEntityFrameworkSqlServer().AddDbContext<DBContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("DataBase")));
+
+builder.Services.AddDbContext<DBContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DBContext>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = true;
+}
+    ).AddEntityFrameworkStores<DBContext>().AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -23,6 +34,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
