@@ -26,6 +26,22 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacidade</a>
                         </li>
                     </ul>
+
+                    <div class="d-flex align-items-center">
+                        @if (User?.Identity?.IsAuthenticated ?? false)
+                        {
+                            <!-- Botão com o nome do usuário que leva ao perfil (Identity Account Manage) -->
+                            <a class="btn btn-outline-primary me-2" asp-area="Identity" asp-page="/Account/Manage/Index">
+                                @User.Identity.Name
+                            </a>
+                        }
+                        else
+                        {
+                            <!-- Mantém opção de login/registro — você já tem _LoginPartial, mas pode exibir links simples -->
+                            <a class="btn btn-outline-secondary me-2" asp-area="Identity" asp-page="/Account/Login">Entrar</a>
+                            <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Register">Registrar</a>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
