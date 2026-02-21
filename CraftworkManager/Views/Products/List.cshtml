@@ -31,7 +31,7 @@
                 <td>@product.StandardCost</td>
                 <td>@product.StandardPrice</td>
                 <td>@(@product.StandardPrice - @product.StandardCost)</td>
-                <td><a>Editar</a></td>
+                <td><a class="btn btn-primary" asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id">Editar</a></td>
             </tr>
         }
     </tbody>

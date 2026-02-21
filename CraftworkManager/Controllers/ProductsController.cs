@@ -50,5 +50,39 @@ namespace CraftworkManager.Controllers
 
             return View(products);
         }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var product = await DbContext.Products.FindAsync(id);
+
+            if(product is not null && product.userId == userId){
+                return View(product);
+            }else { 
+                return View(null);
+            }
+            
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Edit(Product viewModel)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var product = await DbContext.Products.FindAsync(viewModel.Id);
+
+            if(product is not null && product.userId == userId)
+            {
+                product.Name = viewModel.Name;
+                product.Description = viewModel.Description;
+                product.StandardCost = viewModel.StandardCost;
+                product.StandardPrice = viewModel.StandardPrice;
+
+                await DbContext.SaveChangesAsync();
+            }
+            return RedirectToAction("List", "Products");
+        }
     }
 }
