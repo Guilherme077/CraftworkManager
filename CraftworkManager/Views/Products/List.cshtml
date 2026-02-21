@@ -1,0 +1,38 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Produtos";
+}
+
+@model List<CraftworkManager.Models.Product>
+
+<h1>Produtos</h1>
+<a asp-controller="Products" asp-action="Add" class="btn btn-primary">Criar Novo</a>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Custo de Produção</th>
+            <th>Preço de Venda</th>
+            <th>Lucro Estimado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var product in Model)
+        {
+            <tr>
+                <td>@product.Name</td>
+                <td>@product.Description</td>
+                <td>@product.StandardCost</td>
+                <td>@product.StandardPrice</td>
+                <td>@(@product.StandardPrice - @product.StandardCost)</td>
+                <td><a>Editar</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

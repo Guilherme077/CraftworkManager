@@ -2,6 +2,7 @@
 using CraftworkManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace CraftworkManager.Controllers
@@ -37,6 +38,17 @@ namespace CraftworkManager.Controllers
             await DbContext.SaveChangesAsync();
 
             return View();
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> List()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var products = await DbContext.Products.Where(p => p.userId == userId).ToListAsync();
+
+            return View(products);
         }
     }
 }
