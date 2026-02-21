@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraftworkManager.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20260214115455_InitialCreate")]
+    [Migration("20260215151513_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -27,11 +27,9 @@ namespace CraftworkManager.Migrations
 
             modelBuilder.Entity("CraftworkManager.Models.Product", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -41,10 +39,19 @@ namespace CraftworkManager.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("StandardCost")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("StandardPrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("userId");
 
                     b.ToTable("Products");
                 });
@@ -249,6 +256,17 @@ namespace CraftworkManager.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("CraftworkManager.Models.Product", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
