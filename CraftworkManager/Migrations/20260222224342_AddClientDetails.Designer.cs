@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraftworkManager.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20260215151513_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260222224342_AddClientDetails")]
+    partial class AddClientDetails
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,90 @@ namespace CraftworkManager.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("CraftworkManager.Models.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ClientAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastUpdateOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentWay")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("WithNF")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("userId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("CraftworkManager.Models.OrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BaseProductId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("BaseProductId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double?>("Cost")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("OrderId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double?>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BaseProductId1");
+
+                    b.HasIndex("OrderId1");
+
+                    b.ToTable("OrderItems");
+                });
 
             modelBuilder.Entity("CraftworkManager.Models.Product", b =>
                 {
@@ -54,6 +138,38 @@ namespace CraftworkManager.Migrations
                     b.HasIndex("userId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("CraftworkManager.Models.Shipment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OrderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("OrderId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ShippedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TrackingCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransportCompany")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId1");
+
+                    b.ToTable("Shipments");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -258,6 +374,34 @@ namespace CraftworkManager.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("CraftworkManager.Models.Order", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CraftworkManager.Models.OrderItem", b =>
+                {
+                    b.HasOne("CraftworkManager.Models.Product", "BaseProduct")
+                        .WithMany()
+                        .HasForeignKey("BaseProductId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CraftworkManager.Models.Order", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId1");
+
+                    b.Navigation("BaseProduct");
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("CraftworkManager.Models.Product", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
@@ -267,6 +411,17 @@ namespace CraftworkManager.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CraftworkManager.Models.Shipment", b =>
+                {
+                    b.HasOne("CraftworkManager.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -318,6 +473,11 @@ namespace CraftworkManager.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CraftworkManager.Models.Order", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 #pragma warning restore 612, 618
         }

@@ -28,6 +28,14 @@ namespace CraftworkManager.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ClientAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -46,7 +54,13 @@ namespace CraftworkManager.Migrations
                     b.Property<bool>("WithNF")
                         .HasColumnType("bit");
 
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("userId");
 
                     b.ToTable("Orders");
                 });
@@ -74,7 +88,7 @@ namespace CraftworkManager.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("OrderId1")
+                    b.Property<Guid?>("OrderId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<double?>("Price")
@@ -357,6 +371,17 @@ namespace CraftworkManager.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("CraftworkManager.Models.Order", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CraftworkManager.Models.OrderItem", b =>
                 {
                     b.HasOne("CraftworkManager.Models.Product", "BaseProduct")
@@ -367,9 +392,7 @@ namespace CraftworkManager.Migrations
 
                     b.HasOne("CraftworkManager.Models.Order", "Order")
                         .WithMany("OrderItems")
-                        .HasForeignKey("OrderId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OrderId1");
 
                     b.Navigation("BaseProduct");
 
