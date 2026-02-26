@@ -21,6 +21,7 @@ namespace CraftworkManager.Controllers
             {
                 CreatedOn = DateTime.Now,
                 LastUpdateOn = DateTime.Now,
+                DeadlineOn = DateTime.Now.AddDays(1),
                 Status = OrderStatus.Pending,
                 Url = null,
                 WithNF = false,
@@ -51,6 +52,15 @@ namespace CraftworkManager.Controllers
             });
 
             return View(order);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> List()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var orders = await DbContext.Orders.Where(p => p.userId == userId).OrderBy(p => p.DeadlineOn).ToListAsync();
+            return View(orders);
         }
     }
 }

@@ -13,6 +13,7 @@ namespace CraftworkManager.Models
 
         public DateTime CreatedOn { get; set; }
         public DateTime? LastUpdateOn { get; set; }
+        public DateTime? DeadlineOn { get; set; }
         public OrderStatus Status { get; set; }
         public string? Url { get; set; }
         public bool WithNF {  get; set; }
@@ -20,7 +21,12 @@ namespace CraftworkManager.Models
         public string ClientName { get; set; }
         public string ClientAddress { get; set; }
 
-
+        public string getSmallDescription()
+        {
+            if(OrderItems.Count == 0) return "Pedido sem itens";
+            if(OrderItems.Count == 1) return $"{OrderItems.First().BaseProduct.Name}";
+            return $"{OrderItems.First().BaseProduct.Name}... + {OrderItems.Count - 1}";
+        }
     }
 
     public enum OrderStatus

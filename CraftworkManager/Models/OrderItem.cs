@@ -13,5 +13,16 @@
         public int Quantity { get; set; }
         public string OrderId { get; set; }
         public Order? Order { get; set; } = null!;
+        public OrderItemStatus Status { get; set; }
+
+    }
+
+    public enum OrderItemStatus
+    {
+        Pending,
+        InProduction,
+        Finished,
+        Cancelled,
+        Paused
     }
 }
