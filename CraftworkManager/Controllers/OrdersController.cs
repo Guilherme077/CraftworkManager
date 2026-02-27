@@ -53,6 +53,28 @@ namespace CraftworkManager.Controllers
 
             return View(order);
         }
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Edit(Order viewModel)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var order = await DbContext.Orders.FindAsync(viewModel.Id);
+
+            if (order is not null && order.userId == userId)
+            {
+                order.DeadlineOn = viewModel.DeadlineOn;
+                order.ClientName = viewModel.ClientName;
+                order.ClientAddress = viewModel.ClientAddress;
+                order.PaymentWay= viewModel.PaymentWay;
+                order.Url = viewModel.Url;
+                order.WithNF = viewModel.WithNF;
+                order.LastUpdateOn = DateTime.Now;
+
+                await DbContext.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Edit", "Orders", new { id = order.Id });
+        }
 
         [Authorize]
         [HttpGet]

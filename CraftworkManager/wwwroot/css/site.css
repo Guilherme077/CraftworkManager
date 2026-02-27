@@ -20,3 +20,22 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.div-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+    .div-container div {
+        flex: 1;
+        min-width: 300px;
+        border-radius: 8px;
+    }
+
+@media (max-width: 600px) {
+    .div-container div {
+        flex: 1 1 100%;
+    }
+}
