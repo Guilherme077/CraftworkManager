@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace CraftworkManager.Controllers
 {
@@ -41,7 +42,7 @@ namespace CraftworkManager.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var order = await DbContext.Orders.FirstOrDefaultAsync(p => p.Id == id && p.userId == userId);
+            var order = await DbContext.Orders.Include(o => o.OrderItems).ThenInclude(o => o.BaseProduct).FirstOrDefaultAsync(o => o.Id == id && o.userId == userId);
 
             ViewBag.PaymentList = Enum.GetValues(typeof(Payment))
             .Cast<Payment>()
@@ -83,6 +84,59 @@ namespace CraftworkManager.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var orders = await DbContext.Orders.Where(p => p.userId == userId).OrderBy(p => p.DeadlineOn).ToListAsync();
             return View(orders);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult AddItem(Guid orderId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            ViewBag.Products = DbContext.Products.Where(p => p.userId == userId).Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.Name
+            });
+
+            var vm = new AddItemViewModel { OrderId = orderId };
+            return View(vm);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AddItem(AddItemViewModel viewModel)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var product = await DbContext.Products
+                .FirstOrDefaultAsync(p => p.Id == viewModel.ProductId && p.userId == userId);
+
+            if (product is null)
+                return BadRequest();
+
+            var order = await DbContext.Orders
+                .FirstOrDefaultAsync(o => o.Id == viewModel.OrderId && o.userId == userId);
+
+            if (order is null)
+                return BadRequest();
+
+            var item = new OrderItem
+            {
+                OrderId = viewModel.OrderId,
+                Order = order,
+                BaseProductId = viewModel.ProductId,
+                BaseProduct = product,
+                Quantity = viewModel.Quantity,
+                Cost = viewModel.Cost,
+                Price = viewModel.Price,
+                Description = viewModel.Description
+            };
+
+            await DbContext.OrderItems.AddAsync(item);
+            await DbContext.SaveChangesAsync();
+
+            return RedirectToAction("Edit", "Orders",
+                new { id = item.OrderId });
         }
     }
 }

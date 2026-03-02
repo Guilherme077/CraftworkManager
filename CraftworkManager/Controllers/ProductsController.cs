@@ -84,5 +84,31 @@ namespace CraftworkManager.Controllers
             }
             return RedirectToAction("List", "Products");
         }
+
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult GetProductInfo(Guid productId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var product = DbContext.Products
+            .Where(p => p.Id == productId && p.userId == userId)
+            .Select(p => new
+            {
+                price = p.StandardPrice,
+                cost = p.StandardCost,
+                description = p.Description,
+                name = p.Name
+
+            })
+            .FirstOrDefault();
+
+            if(product is null)
+            {
+                return NotFound();
+            }
+
+            return Json(product);
+        }
     }
 }

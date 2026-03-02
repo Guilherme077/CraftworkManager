@@ -16,7 +16,7 @@ else
         <div class="half-left">
             <h3>Itens do Pedido</h3>
 
-            <a asp-controller="Orders" asp-action="AddItem" class="btn btn-primary">Adicionar Item</a>
+            <a asp-controller="Orders" asp-action="AddItem" asp-route-orderId="@Model.Id" class="btn btn-primary">Adicionar Item</a>
 
             <table class="table mb-5">
                 <thead>

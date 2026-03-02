@@ -1,0 +1,74 @@
+﻿@model CraftworkManager.Models.AddItemViewModel
+
+<form method="post" asp-action="AddItem">
+    <input type="hidden" asp-for="OrderId" />
+
+    <label>Produto</label>
+    <select id="productSelect"
+            asp-for="ProductId"
+            asp-items="ViewBag.Products">
+        <option value="">Selecione</option>
+    </select>
+
+    <div id="itemFields" style="display:none;">
+
+        <div class="mt-3">
+            <label class="form-label">Descrição</label>
+            <input type="text" class="form-control" id="descriptionInput" asp-for="Description" />
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">Preço unitário</label>
+            <input type="number" class="form-control" step="0.01" id="priceInput" asp-for="Price" />
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">Custo de Produção por unidade</label>
+            <input type="number" class="form-control" step="0.01" id="costInput" asp-for="Cost" />
+        </div>
+
+        <span>Valores de Preço e Custo são utilizados para as estimativas financeiras e não compõe receita ou despesa definitiva.</span>
+
+        <div class="mt-3">
+            <label class="form-label">Quantidade</label>
+            <input class="form-control" type="number" min="1" value="1" asp-for="Quantity" />
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Adicionar</button>
+        </div>
+
+    </div>
+</form>
+
+<script>
+    const select = document.getElementById("productSelect");
+    const fields = document.getElementById("itemFields");
+    const priceInput = document.getElementById("priceInput");
+    const costInput = document.getElementById("costInput");
+    const descriptionInput = document.getElementById("descriptionInput");
+
+    select.addEventListener("change", async function () {
+        const productId = this.value;
+
+        if (!productId) {
+            fields.style.display = "none";
+            return;
+        }
+
+        const response = await fetch(`/Products/GetProductInfo?productId=${productId}`);
+
+        if (!response.ok) {
+            alert("Erro ao buscar produto");
+            return;
+        }
+
+        const data = await response.json();
+
+        priceInput.value = (data.price ?? 0).toString().replace(',', '.');
+        costInput.value = (data.cost ?? 0).toFixed(2).toString().replace(',', '.');
+        descriptionInput.value = data.description ?? '';
+
+        fields.style.display = "block";
+    });
+</script>

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraftworkManager.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20260222220353_InitialMigration")]
+    [Migration("20260227150449_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -31,7 +31,18 @@ namespace CraftworkManager.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ClientAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeadlineOn")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("LastUpdateOn")
@@ -66,11 +77,7 @@ namespace CraftworkManager.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("BaseProductId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("BaseProductId1")
+                    b.Property<Guid>("BaseProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<double?>("Cost")
@@ -79,11 +86,7 @@ namespace CraftworkManager.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OrderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("OrderId1")
+                    b.Property<Guid?>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<double?>("Price")
@@ -92,11 +95,14 @@ namespace CraftworkManager.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("BaseProductId1");
+                    b.HasIndex("BaseProductId");
 
-                    b.HasIndex("OrderId1");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderItems");
                 });
@@ -381,13 +387,13 @@ namespace CraftworkManager.Migrations
                 {
                     b.HasOne("CraftworkManager.Models.Product", "BaseProduct")
                         .WithMany()
-                        .HasForeignKey("BaseProductId1")
+                        .HasForeignKey("BaseProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CraftworkManager.Models.Order", "Order")
                         .WithMany("OrderItems")
-                        .HasForeignKey("OrderId1");
+                        .HasForeignKey("OrderId");
 
                     b.Navigation("BaseProduct");
 

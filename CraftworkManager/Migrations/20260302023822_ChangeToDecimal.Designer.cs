@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraftworkManager.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20260226175614_AddOrderDeadline")]
-    partial class AddOrderDeadline
+    [Migration("20260302023822_ChangeToDecimal")]
+    partial class ChangeToDecimal
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,28 +77,20 @@ namespace CraftworkManager.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("BaseProductId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("BaseProductId1")
+                    b.Property<Guid>("BaseProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double?>("Cost")
-                        .HasColumnType("float");
+                    b.Property<decimal?>("Cost")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OrderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("OrderId1")
+                    b.Property<Guid?>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double?>("Price")
-                        .HasColumnType("float");
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -108,9 +100,9 @@ namespace CraftworkManager.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BaseProductId1");
+                    b.HasIndex("BaseProductId");
 
-                    b.HasIndex("OrderId1");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderItems");
                 });
@@ -395,13 +387,13 @@ namespace CraftworkManager.Migrations
                 {
                     b.HasOne("CraftworkManager.Models.Product", "BaseProduct")
                         .WithMany()
-                        .HasForeignKey("BaseProductId1")
+                        .HasForeignKey("BaseProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CraftworkManager.Models.Order", "Order")
                         .WithMany("OrderItems")
-                        .HasForeignKey("OrderId1");
+                        .HasForeignKey("OrderId");
 
                     b.Navigation("BaseProduct");
 
