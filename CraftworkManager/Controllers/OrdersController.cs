@@ -82,7 +82,7 @@ namespace CraftworkManager.Controllers
         public async Task<IActionResult> List()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var orders = await DbContext.Orders.Where(p => p.userId == userId).OrderBy(p => p.DeadlineOn).ToListAsync();
+            var orders = await DbContext.Orders.Where(p => p.userId == userId).Include(o => o.OrderItems).ThenInclude(oi => oi.BaseProduct).OrderBy(p => p.DeadlineOn).ToListAsync();
             return View(orders);
         }
 

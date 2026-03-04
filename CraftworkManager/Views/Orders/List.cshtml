@@ -14,10 +14,10 @@
 <table class="table">
     <thead>
         <tr>
+            <th>Status</th>
             <th>Descrição</th>
             <th>Data do Pedido</th>
             <th>Prazo</th>
-            <th>Status</th>
             <th>Cliente</th>
             <th></th>
         </tr>
@@ -26,12 +26,30 @@
         @foreach (var order in Model)
         {
             <tr>
+                <td>@order.Status</td>
                 <td>@order.getSmallDescription()</td>
                 <td>@order.CreatedOn</td>
                 <td>@order.DeadlineOn</td>
-                <td>@order.Status</td>
                 <td>@order.ClientName</td>
-                <td><a class="btn btn-primary" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Visualizar</a></td>
+                <td>
+                    <a class="btn btn-primary" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Visualizar</a>
+                    
+                    @if (order.Status == OrderStatus.InProduction)
+                    {
+                        <a class="btn btn-warning" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Pausar</a>
+                        <a class="btn btn-success" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Finalizar Produção</a>
+                    }
+                    @if (order.Status == OrderStatus.Pending)
+                    {
+                        <a class="btn btn-success" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Enviar para Produção</a>
+                    }
+                    @if (order.Status == OrderStatus.ReadyToShip)
+                    {
+                        <a class="btn btn-success" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Enviar Pedido</a>
+                    }
+
+                    <a class="btn btn-danger" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Cancelar</a>
+                </td>
             </tr>
         }
     </tbody>
