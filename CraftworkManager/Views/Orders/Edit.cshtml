@@ -36,7 +36,7 @@ else
                             <td>@orderItem.Description</td>
                             <td>@orderItem.Price</td>
                             <td>@orderItem.Quantity</td>
-                            <td><a class="btn btn-primary" asp-controller="Orders" asp-action="EditItem" asp-route-id="@orderItem.Id">Editar</a></td>
+                            <td><a class="btn btn-primary" asp-controller="Orders" asp-action="EditItem" asp-route-id="@orderItem.Id">Editar</a><a class="btn btn-danger" asp-controller="Orders" asp-action="DeleteItem" asp-route-id="@orderItem.Id">X</a></td>
                         </tr>
                     }
                 </tbody>

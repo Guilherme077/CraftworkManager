@@ -66,7 +66,7 @@ namespace CraftworkManager.Controllers
                 order.DeadlineOn = viewModel.DeadlineOn;
                 order.ClientName = viewModel.ClientName;
                 order.ClientAddress = viewModel.ClientAddress;
-                order.PaymentWay= viewModel.PaymentWay;
+                order.PaymentWay = viewModel.PaymentWay;
                 order.Url = viewModel.Url;
                 order.WithNF = viewModel.WithNF;
                 order.LastUpdateOn = DateTime.Now;
@@ -137,6 +137,63 @@ namespace CraftworkManager.Controllers
 
             return RedirectToAction("Edit", "Orders",
                 new { id = item.OrderId });
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> EditItem(Guid id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var item = await DbContext.OrderItems
+                .Include(i => i.BaseProduct)
+                .Include(i => i.Order)
+                .FirstOrDefaultAsync(i => i.Id == id && i.Order.userId == userId);
+            if (item is null)
+                return NotFound();
+
+            return View(item);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> EditItem(OrderItem viewModel)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var item = await DbContext.OrderItems
+                .Include(i => i.BaseProduct)
+                .Include(i => i.Order)
+                .FirstOrDefaultAsync(i => i.Id == viewModel.Id && i.Order.userId == userId);
+            if (item is null)
+                return NotFound();
+
+            item.Quantity = viewModel.Quantity;
+            item.Cost = viewModel.Cost;
+            item.Price = viewModel.Price;
+            item.Description = viewModel.Description;
+
+            await DbContext.SaveChangesAsync();
+            return RedirectToAction("Edit", "Orders",
+                new { id = item.OrderId });
+        }
+
+        //TODO: Refactor to change to HttpPost
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> DeleteItem(Guid id)
+        {
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var item = await DbContext.OrderItems.Include(i => i.Order).FirstOrDefaultAsync(i => i.Id == id && i.Order.userId == userId);
+
+            if(item is null)
+            {
+                return NotFound();
+            }
+
+            DbContext.OrderItems.Remove(item);
+            await DbContext.SaveChangesAsync();
+
+            return RedirectToAction("Edit", "Orders", new { id = item.OrderId });
         }
     }
 }
