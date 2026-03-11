@@ -195,5 +195,16 @@ namespace CraftworkManager.Controllers
 
             return RedirectToAction("Edit", "Orders", new { id = item.OrderId });
         }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangeStatus(Guid id, OrderStatus status)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var order = await DbContext.Orders.Where(p => p.userId == userId).FirstOrDefaultAsync(o => o.Id == id);
+            order.Status = status;
+            await DbContext.SaveChangesAsync();
+            return RedirectToAction("List", "Orders");
+        }
     }
 }

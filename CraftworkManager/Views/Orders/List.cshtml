@@ -7,7 +7,8 @@
 
 @model List<CraftworkManager.Models.Order>
 
-<h1>Pedidos</h1>
+<h1>Todos os Pedidos Abertos</h1>
+<span>A lista não inclui pedidos enviados ou cancelados.</span>
 <a asp-controller="Orders" asp-action="Add" class="btn btn-primary">Novo Pedido</a>
 
 
@@ -28,27 +29,60 @@
             <tr>
                 <td>@order.Status</td>
                 <td>@order.getSmallDescription()</td>
-                <td>@order.CreatedOn</td>
-                <td>@order.DeadlineOn</td>
+                <td>@order.CreatedOn.ToString("dd/MM/yyyy")</td>
+                <td>@order.DeadlineOn.Value.ToString("dd/MM/yyyy")</td>
                 <td>@order.ClientName</td>
                 <td>
                     <a class="btn btn-primary" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Visualizar</a>
                     
                     @if (order.Status == OrderStatus.InProduction)
                     {
-                        <a class="btn btn-warning" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Pausar</a>
-                        <a class="btn btn-success" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Finalizar Produção</a>
+                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@order.Id" />
+                            <input type="hidden" name="status" value="@OrderStatus.Paused" />
+                            <button type="submit" class="btn btn-warning">Pausar</button>
+                        </form>
+                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@order.Id" />
+                            <input type="hidden" name="status" value="@OrderStatus.ReadyToShip" />
+                            <button type="submit" class="btn btn-success">Finalizar Produção</button>
+                        </form>
                     }
                     @if (order.Status == OrderStatus.Pending)
                     {
-                        <a class="btn btn-success" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Enviar para Produção</a>
+                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@order.Id" />
+                            <input type="hidden" name="status" value="@OrderStatus.InProduction" />
+                            <button type="submit" class="btn btn-success">Enviar para Produção</button>
+                        </form>
                     }
                     @if (order.Status == OrderStatus.ReadyToShip)
                     {
-                        <a class="btn btn-success" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Enviar Pedido</a>
+                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@order.Id" />
+                            <input type="hidden" name="status" value="@OrderStatus.Shipped" />
+                            <button type="submit" class="btn btn-success">Enviar Pedido</button>
+                        </form>
+                    }
+                    @if (order.Status == OrderStatus.Paused)
+                    {
+                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@order.Id" />
+                            <input type="hidden" name="status" value="@OrderStatus.InProduction" />
+                            <button type="submit" class="btn btn-success">Enviar para Produção</button>
+                        </form>
+                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@order.Id" />
+                            <input type="hidden" name="status" value="@OrderStatus.Pending" />
+                            <button type="submit" class="btn btn-success">Tornar Pendente</button>
+                        </form>
                     }
 
-                    <a class="btn btn-danger" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Cancelar</a>
+                    <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@order.Id" />
+                        <input type="hidden" name="status" value="@OrderStatus.Cancelled" />
+                        <button type="submit" class="btn btn-danger">Cancelar</button>
+                    </form>
                 </td>
             </tr>
         }
