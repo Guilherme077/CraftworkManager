@@ -63,6 +63,27 @@ else
                 </div>
 
                 <div class="mt-3">
+                    <label class="form-label">URL</label>
+                    <input type="text" class="form-control" asp-for="Url" />
+                </div>
+
+                <div class="mt-3">
+                    <label for="notes">Notas:</label><br>
+                    <textarea id="notes" name="notes" rows="5" cols="40" placeholder="Digite notas do pedido aqui..." asp-for="Notes"></textarea>
+                </div>
+                
+
+                <div class="mt-3">
+                    <input type="checkbox" class="form-check-input" id="NF" asp-for="WithNF" />
+                    <label for="NF" class="form-label">Emissão de Nota Fiscal</label>
+                </div>
+
+                <hr />
+                <p>Informações Financeiras</p>
+
+                <p>Preço Total de Venda dos Items: R$@Model.getOrderItemsTotalPrice()</p>
+
+                <div class="mt-3">
                     <label class="form-label">Forma de Pagamento</label>
                     <select asp-for="PaymentWay"
                             asp-items="ViewBag.PaymentList"
@@ -71,20 +92,31 @@ else
                 </div>
 
                 <div class="mt-3">
-                    <label class="form-label">URL</label>
-                    <input type="text" class="form-control" asp-for="Url" />
+                    <label class="form-label">Desconto</label>
+                    <input type="number" class="form-control" step="0.01" id="discountInput" asp-for="Discount" />
                 </div>
 
                 <div class="mt-3">
-                    <input type="checkbox" class="form-check-input" id="NF" asp-for="WithNF" />
-                    <label for="NF" class="form-label">Emissão de Nota Fiscal</label>
+                    <label class="form-label">Aumento de Valor</label>
+                    <input type="number" class="form-control" step="0.01" id="raiseInput" asp-for="Raise" />
                 </div>
+
+                <div class="mt-3">
+                    <label class="form-label">Taxas (valor será adicionado ao Preço de Venda Final)</label>
+                    <input type="number" class="form-control" step="0.01" id="taxesInput" asp-for="Taxes" />
+                </div>
+
+                <hr />
 
 
                 <div class="mt-3">
                     <button type="submit" class="btn btn-primary">Salvar Detalhes</button>
                 </div>
                 <div class="mt-3">
+                    <span>Preço de Venda Final registrado: @Model.getTotalPrice()</span>
+                    <br />
+                    <span>Emitida em: @Model.CreatedOn</span>
+                    <br />
                     <span>Última modificação em: @Model.LastUpdateOn</span>
                 </div>
 

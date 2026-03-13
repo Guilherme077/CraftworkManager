@@ -69,6 +69,10 @@ namespace CraftworkManager.Controllers
                 order.PaymentWay = viewModel.PaymentWay;
                 order.Url = viewModel.Url;
                 order.WithNF = viewModel.WithNF;
+                order.Notes = viewModel.Notes;
+                order.Discount = viewModel.Discount;
+                order.Raise = viewModel.Raise;
+                order.Taxes = viewModel.Taxes;
                 order.LastUpdateOn = DateTime.Now;
 
                 await DbContext.SaveChangesAsync();

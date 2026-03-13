@@ -20,6 +20,21 @@ namespace CraftworkManager.Models
         public Payment PaymentWay { get; set; }
         public string ClientName { get; set; }
         public string ClientAddress { get; set; }
+        public string? Notes { get; set; }
+        public decimal? Discount { get; set; }
+        public decimal? Raise { get; set; }
+        public decimal Taxes { get; set; }
+
+        public decimal getTotalPrice()
+        {
+            decimal itemsTotal = (decimal)OrderItems.Sum(oi => oi.Price * oi.Quantity);
+            return (decimal)(itemsTotal - Discount + Raise + Taxes);
+        }
+
+        public decimal getOrderItemsTotalPrice()
+        {
+            return (decimal)OrderItems.Sum(oi => oi.Price * oi.Quantity);
+        }
 
         public string getSmallDescription()
         {
