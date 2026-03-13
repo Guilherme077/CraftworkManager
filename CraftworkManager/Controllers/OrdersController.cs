@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 using System.Security.Claims;
 using static NuGet.Packaging.PackagingConstants;
 
@@ -12,7 +13,8 @@ namespace CraftworkManager.Controllers
     public class OrdersController : Controller
     {
         private readonly DBContext DbContext;
-        public OrdersController(DBContext dBContext) { DbContext = dBContext; }
+        private readonly IToastNotification _toast;
+        public OrdersController(DBContext dBContext, IToastNotification toast) { DbContext = dBContext; _toast = toast; }
 
         [Authorize]
         [HttpGet]
@@ -59,9 +61,9 @@ namespace CraftworkManager.Controllers
         public async Task<IActionResult> Edit(Order viewModel)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var order = await DbContext.Orders.FindAsync(viewModel.Id);
+            var order = await DbContext.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.Id == viewModel.Id && o.userId == userId);
 
-            if (order is not null && order.userId == userId)
+            if (order is not null)
             {
                 order.DeadlineOn = viewModel.DeadlineOn;
                 order.ClientName = viewModel.ClientName;
@@ -76,6 +78,7 @@ namespace CraftworkManager.Controllers
                 order.LastUpdateOn = DateTime.Now;
 
                 await DbContext.SaveChangesAsync();
+                _toast.AddInfoToastMessage("Preço Final do Pedido: R$" + order.getTotalPrice());
             }
 
             return RedirectToAction("Edit", "Orders", new { id = order.Id });
@@ -208,6 +211,7 @@ namespace CraftworkManager.Controllers
             var order = await DbContext.Orders.Where(p => p.userId == userId).FirstOrDefaultAsync(o => o.Id == id);
             order.Status = status;
             await DbContext.SaveChangesAsync();
+            _toast.AddSuccessToastMessage("Status do pedido atualizado para " + status.ToString());
             return RedirectToAction("List", "Orders");
         }
     }
