@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using static NuGet.Packaging.PackagingConstants;
 
@@ -51,7 +52,7 @@ namespace CraftworkManager.Controllers
             .Select(s => new SelectListItem
             {
                 Value = ((int)s).ToString(),
-                Text = s.ToString()
+                Text = s.GetAttribute<DisplayAttribute>().Name
             });
 
             return View(order);

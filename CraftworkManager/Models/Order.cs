@@ -27,8 +27,8 @@ namespace CraftworkManager.Models
 
         public decimal getTotalPrice()
         {
-            decimal itemsTotal = (decimal)OrderItems.Sum(oi => oi.Price * oi.Quantity);
-            return (decimal)(itemsTotal - Discount + Raise + Taxes);
+            decimal itemsTotal = (decimal)OrderItems.Sum(oi => oi.Price.Value * oi.Quantity);
+            return (decimal)(itemsTotal - (Discount.HasValue? Discount : 0) + (Raise.HasValue? Raise : 0) + Taxes);
         }
 
         public decimal getOrderItemsTotalPrice()
