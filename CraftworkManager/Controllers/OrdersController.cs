@@ -212,6 +212,12 @@ namespace CraftworkManager.Controllers
             var order = await DbContext.Orders.Where(p => p.userId == userId).FirstOrDefaultAsync(o => o.Id == id);
             order.Status = status;
             await DbContext.SaveChangesAsync();
+            
+            if (status == OrderStatus.ReadyToShip)
+            {
+                return RedirectToAction("CreateShipmentByOrder", "Shipments", new { orderId = order.Id});
+            }
+
             _toast.AddSuccessToastMessage("Status do pedido atualizado para " + status.ToString());
             return RedirectToAction("List", "Orders");
         }

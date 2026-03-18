@@ -24,6 +24,7 @@ namespace CraftworkManager.Models
         public decimal? Discount { get; set; }
         public decimal? Raise { get; set; }
         public decimal Taxes { get; set; }
+        public bool Payed { get; set; } = false;
 
         public decimal getTotalPrice()
         {

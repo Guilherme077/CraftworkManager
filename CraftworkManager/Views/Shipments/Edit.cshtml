@@ -1,0 +1,91 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model CraftworkManager.Models.Shipment
+
+@if (Model is null)
+{
+    <p class="alert-warning">Envio não encontrado. O envio pode ter sido excluido ou você não possui acesso.</p>
+}
+else
+{
+    <form method="post">
+
+        <h3>Envio</h3>
+
+        <div class="mt-3">
+            <label class="form-label">Codigo de Rastreio</label>
+            <input type="text" class="form-control" asp-for="TrackingCode" />
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">Link de Rastreio</label>
+            <input type="text" class="form-control" asp-for="TrackingUrl" />
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">Transportadora</label>
+            <input type="text" class="form-control" asp-for="TransportCompany" />
+        </div>
+
+        <div class="mt-3">
+            <label for="notes">Notas:</label><br>
+            <textarea id="notes" name="notes" rows="5" cols="40" placeholder="Digite notas do envio aqui..." asp-for="Notes"></textarea>
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">Frete</label>
+            <input type="number" class="form-control" step="0.01" id="costInput" asp-for="ShippingCost" />
+        </div>
+
+        <div class="mt-3">
+            <input type="checkbox" class="form-check-input" id="SCIncluded" asp-for="ShippingCostIncludedOnPrice" />
+            <label for="SCIncluded" class="form-label">Frete já incluso no valor do pedido.</label>
+        </div>
+
+        <hr />
+        <p>Informações Financeiras</p>
+
+        <div class="mt-3">
+            <label class="form-label">Endereço</label>
+            <input type="text" class="form-control" asp-for="Address" />
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">Cidade</label>
+            <input type="text" class="form-control" asp-for="City" />
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">Estado</label>
+            <input type="text" class="form-control" asp-for="State" />
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">País</label>
+            <input type="text" class="form-control" asp-for="Country" />
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">CEP</label>
+            <input type="text" class="form-control" asp-for="ZipCode" />
+        </div>
+
+        <hr />
+
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Salvar Detalhes</button>
+        </div>
+        <div class="mt-3">
+            <span>Envio criado em: @Model.CreatedAt</span>
+            <br />
+            <span>Status do envio: @Model.Status</span>
+        </div>
+
+    </form>
+}
+
