@@ -1,0 +1,65 @@
+﻿@using System.ComponentModel.DataAnnotations
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Envios";
+}
+
+@model List<CraftworkManager.Models.Shipment>
+
+<h1>Todos os Envios Pendentes ou Enviados</h1>
+<span>A lista não inclui envios concluídos ou cancelados.</span>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Status</th>
+            <th>Código de Rastreio</th>
+            <th>Transportadora</th>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>Prazo do Pedido</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var shipment in Model)
+        {
+            var statusName = shipment.Status.GetAttribute<DisplayAttribute>();
+            <tr>
+                <td>@statusName.Name</td>
+                <td>@shipment.TrackingCode</td>
+                <td>@shipment.TransportCompany</td>
+                <td>@shipment.Order.getSmallDescription()</td>
+                <td>@shipment.Order.ClientName</td>
+                <td>@shipment.Order.DeadlineOn.Value.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a class="btn btn-primary" asp-controller="Shipments" asp-action="Edit" asp-route-id="@shipment.Id">Editar</a>
+
+                    @if (shipment.Status == ShipmentStatus.Pending)
+                    {
+                        <form asp-controller="Shipment" asp-action="ChangeStatus" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@shipment.Id" />
+                            <input type="hidden" name="status" value="@ShipmentStatus.Shipped" />
+                            <button type="submit" class="btn btn-success">Pedido Enviado</button>
+                        </form>
+                    }
+                    @if (shipment.Status == ShipmentStatus.Shipped)
+                    {
+                        <form asp-controller="Shipment" asp-action="ChangeStatus" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@shipment.Id" />
+                            <input type="hidden" name="status" value="@ShipmentStatus.Delivered" />
+                            <button type="submit" class="btn btn-success">Entregue</button>
+                        </form>
+                    }
+                    <form asp-controller="Shipment" asp-action="ChangeStatus" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@shipment.Id" />
+                        <input type="hidden" name="status" value="@ShipmentStatus.Cancelled" />
+                        <button type="submit" class="btn btn-danger">Cancelar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -18,7 +18,7 @@ namespace CraftworkManager.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var shipments = await DbContext.Shipments.Where(s => s.Order.userId == userId).Include(s => s.Order).OrderBy(s => s.ShippedOn).ToListAsync();
+            var shipments = await DbContext.Shipments.Where(s => s.Order.userId == userId).Include(s => s.Order).Where(s => s.Status == ShipmentStatus.Pending || s.Status == ShipmentStatus.Shipped).OrderBy(s => s.ShippedOn).ToListAsync();
 
             return View(shipments);
         }
@@ -47,6 +47,34 @@ namespace CraftworkManager.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var shipment = await DbContext.Shipments.Where(s => s.Order.userId == userId).Include(s => s.Order).FirstOrDefaultAsync(s => s.Id == id);
             return View(shipment);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Edit(Shipment viewModel)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var shipment = await DbContext.Shipments.Include(s => s.Order).FirstOrDefaultAsync(s => s.Id == viewModel.Id && s.Order.userId == userId);
+
+            if(shipment is not null)
+            {
+                shipment.TrackingCode = viewModel.TrackingCode;
+                shipment.TrackingUrl = viewModel.TrackingUrl;
+                shipment.TransportCompany = viewModel.TransportCompany;
+                shipment.Notes = viewModel.Notes;
+                shipment.ShippingCost = viewModel.ShippingCost;
+                shipment.ShippingCostIncludedOnPrice = viewModel.ShippingCostIncludedOnPrice;
+                shipment.Address = viewModel.Address;
+                shipment.City = viewModel.City;
+                shipment.State = viewModel.State;
+                shipment.ZipCode = viewModel.ZipCode;
+                shipment.Country = viewModel.Country;
+
+                await DbContext.SaveChangesAsync();
+                _toast.AddSuccessToastMessage("Alterações aplicadas!");
+            }
+
+            return RedirectToAction("Index");
         }
 
     }

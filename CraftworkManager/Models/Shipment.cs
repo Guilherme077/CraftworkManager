@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace CraftworkManager.Models
 {
@@ -30,11 +31,17 @@ namespace CraftworkManager.Models
 
     public enum ShipmentStatus
     {
+        [Display(Name = "Pendente")]
         Pending,
+        [Display(Name = "A caminho")]
         Shipped,
+        [Display(Name = "Entregue")]
         Delivered,
+        [Display(Name = "Falhou")]
         Failed,
+        [Display(Name = "Retornou")]
         Returned,
+        [Display(Name = "Cancelado")]
         Cancelled
     }
 }
