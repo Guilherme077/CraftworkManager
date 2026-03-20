@@ -31,7 +31,7 @@ namespace CraftworkManager.Controllers
             var orderToShip = await DbContext.Orders.Include(o => o.User).FirstOrDefaultAsync(o => o.Id == orderId && o.userId == userId);
             Shipment shipment = new Shipment()
             {
-                OrderId = orderToShip.Id.ToString(),
+                OrderId = orderToShip.Id,
                 CreatedAt = DateTime.Now,
                 Status = ShipmentStatus.Pending
             };

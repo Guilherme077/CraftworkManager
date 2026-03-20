@@ -170,7 +170,12 @@ namespace CraftworkManager.Migrations
                     WithNF = table.Column<bool>(type: "bit", nullable: false),
                     PaymentWay = table.Column<int>(type: "int", nullable: false),
                     ClientName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClientAddress = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ClientAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Raise = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Taxes = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Payed = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -210,19 +215,29 @@ namespace CraftworkManager.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OrderId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ShippedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ShippedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeliveredOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TrackingCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TrackingUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TransportCompany = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    ShippingCost = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    ShippingCostIncludedOnPrice = table.Column<bool>(type: "bit", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Shipments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Shipments_Orders_OrderId1",
-                        column: x => x.OrderId1,
+                        name: "FK_Shipments_Orders_OrderId",
+                        column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -235,8 +250,8 @@ namespace CraftworkManager.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BaseProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Cost = table.Column<double>(type: "float", nullable: true),
-                    Price = table.Column<double>(type: "float", nullable: true),
+                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false)
@@ -317,9 +332,9 @@ namespace CraftworkManager.Migrations
                 column: "userId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Shipments_OrderId1",
+                name: "IX_Shipments_OrderId",
                 table: "Shipments",
-                column: "OrderId1");
+                column: "OrderId");
         }
 
         /// <inheritdoc />
