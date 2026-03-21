@@ -119,7 +119,7 @@
                                     @foreach (var shipment in Model.ShipmentsWithoutIncome)
                                     {
                                         <tr>
-                                            <td>@shipment.Order.getSmallDescription()</td>
+                                            <td>@shipment.getDescription()</td>
                                             <td>
                                                 <span class="badge bg-info">
                                                     @shipment.Status.ToString()

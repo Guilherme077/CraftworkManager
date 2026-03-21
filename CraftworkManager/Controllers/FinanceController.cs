@@ -45,6 +45,8 @@ namespace CraftworkManager.Controllers
             var shipmentsWithoutIncome = await DbContext.Shipments
                 .Where(s => s.Status != ShipmentStatus.Cancelled && !shipmentIds.Contains(s.Id))
                 .Include(s => s.Order)
+                .Include(s => s.Order.OrderItems)
+                .ThenInclude(oi => oi.BaseProduct)
                 .ToListAsync();
 
             var dashboardData = new FinanceDashboardViewModel

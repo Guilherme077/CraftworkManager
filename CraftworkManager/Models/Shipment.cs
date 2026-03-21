@@ -27,6 +27,16 @@ namespace CraftworkManager.Models
         public string? ZipCode { get; set; }
         public string Country { get; set; } = "Brasil";
 
+        public string getAddressDescription()
+        {
+            return $"Envio para {City} - {State}, {Country}";
+        }
+        public string getDescription()
+        {
+            return $"{Order.getSmallDescription()} para {City}, {State}";
+
+        }
+
     }
 
     public enum ShipmentStatus
