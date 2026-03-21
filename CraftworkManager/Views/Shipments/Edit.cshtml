@@ -27,8 +27,20 @@ else
                 <label class="form-label">Link de Rastreio</label>
                 <input type="text" class="form-control" asp-for="TrackingUrl" />
             </div>
-       }
-            
+        }
+        else
+        {
+            <div class="mt-3">
+                <label class="form-label">Codigo de Rastreio</label>
+                <input type="hidden" class="form-control" asp-for="TrackingCode" />
+            </div>
+
+            <div class="mt-3">
+                <label class="form-label">Link de Rastreio</label>
+                <input type="hidden" class="form-control" asp-for="TrackingUrl" />
+            </div>
+            }
+
         
 
         <div class="mt-3">
