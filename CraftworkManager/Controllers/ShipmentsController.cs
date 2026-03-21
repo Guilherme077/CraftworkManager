@@ -77,5 +77,27 @@ namespace CraftworkManager.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangeStatus(Guid id, ShipmentStatus status)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var shipment = await DbContext.Shipments.Include(s => s.Order).FirstOrDefaultAsync(s => s.Id == id && s.Order.userId == userId);
+            if (shipment is not null)
+            {
+                shipment.Status = status;
+                if (status == ShipmentStatus.Shipped)
+                {
+                    shipment.ShippedOn = DateTime.Now;
+                    await DbContext.SaveChangesAsync();
+                    return RedirectToAction("Edit", new { id = id });
+                }
+                else if (status == ShipmentStatus.Delivered)
+                    shipment.DeliveredOn = DateTime.Now;
+                await DbContext.SaveChangesAsync();
+                _toast.AddSuccessToastMessage("Status atualizado!");
+            }
+            return RedirectToAction("Index");
+        }
     }
 }

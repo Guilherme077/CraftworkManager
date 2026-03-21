@@ -39,21 +39,21 @@
 
                     @if (shipment.Status == ShipmentStatus.Pending)
                     {
-                        <form asp-controller="Shipment" asp-action="ChangeStatus" method="post" style="display:inline;">
+                        <form asp-controller="Shipments" asp-action="ChangeStatus" method="post" style="display:inline;">
                             <input type="hidden" name="id" value="@shipment.Id" />
                             <input type="hidden" name="status" value="@ShipmentStatus.Shipped" />
-                            <button type="submit" class="btn btn-success">Pedido Enviado</button>
+                            <button type="submit" class="btn btn-success">Marcar como Enviado</button>
                         </form>
                     }
                     @if (shipment.Status == ShipmentStatus.Shipped)
                     {
-                        <form asp-controller="Shipment" asp-action="ChangeStatus" method="post" style="display:inline;">
+                        <form asp-controller="Shipments" asp-action="ChangeStatus" method="post" style="display:inline;">
                             <input type="hidden" name="id" value="@shipment.Id" />
                             <input type="hidden" name="status" value="@ShipmentStatus.Delivered" />
-                            <button type="submit" class="btn btn-success">Entregue</button>
+                            <button type="submit" class="btn btn-success">Marcar como Entregue</button>
                         </form>
                     }
-                    <form asp-controller="Shipment" asp-action="ChangeStatus" method="post" style="display:inline;">
+                    <form asp-controller="Shipments" asp-action="ChangeStatus" method="post" style="display:inline;">
                         <input type="hidden" name="id" value="@shipment.Id" />
                         <input type="hidden" name="status" value="@ShipmentStatus.Cancelled" />
                         <button type="submit" class="btn btn-danger">Cancelar</button>
