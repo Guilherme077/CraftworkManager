@@ -1,7 +1,145 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using System.ComponentModel.DataAnnotations
+@model CraftworkManager.Models.Finance.FinanceDashboardViewModel
+
 @{
+    ViewData["Title"] = "Financeiro";
 }
-@model CraftworkManager.Models.Finance.Transaction
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Financeiro</h1>
+        <div>
+            <a class="btn btn-primary" href="#" onclick="return false;">Nova Transação</a>
+            <a class="btn btn-outline-primary" href="#" onclick="return false;">Histórico</a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Saldo Total</h5>
+                    <h3 class="@(Model.TotalProfit >= 0 ? "text-success" : "text-danger")">
+                        @Model.TotalProfit.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Receita do Mês</h5>
+                    <h3 class="text-success">
+                        @Model.MonthlyIncome.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Despesa do Mês</h5>
+                    <h3 class="text-danger">
+                        @Model.MonthlyExpenses.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Últimas Transações</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.LastTransactions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Descrição</th>
+                                        <th>Tipo</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in Model.LastTransactions)
+                                    {
+                                        var typeName = transaction.Type.GetAttribute<DisplayAttribute>();
+                                        <tr>
+                                            <td>@transaction.Date.ToString("dd/MM/yyyy")</td>
+                                            <td>@transaction.Description</td>
+                                            <td>
+                                                <span class="badge @(transaction.Type == CraftworkManager.Models.Finance.TransactionType.Income ? "bg-success" : "bg-danger")">
+                                                    
+                                                        @typeName.Name
+                                                    
+                                                        </span>
+                                            </td>
+                                            <td class="@(transaction.Type == CraftworkManager.Models.Finance.TransactionType.Income ? "text-success" : "text-danger")">
+                                                @(transaction.Type == CraftworkManager.Models.Finance.TransactionType.Income ? "+" : "-")
+                                                @transaction.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Nenhuma transação registrada.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Envios sem receita vinculada</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.ShipmentsWithoutIncome.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Status</th>
+                                        <th>Data do Pedido</th>
+                                        <th>Cliente</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var shipment in Model.ShipmentsWithoutIncome)
+                                    {
+                                        <tr>
+                                            <td>@shipment.Order.getSmallDescription()</td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    @shipment.Status.ToString()
+                                                </span>
+                                            </td>
+                                            <td>@shipment.Order.CreatedOn.ToString("dd/MM/yyyy")</td>
+                                            <td>@shipment.Order.ClientName</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Nenhum envio com pagamento pendente.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 

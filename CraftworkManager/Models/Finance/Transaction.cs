@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace CraftworkManager.Models.Finance
 {
@@ -22,7 +23,9 @@ namespace CraftworkManager.Models.Finance
 
     public enum TransactionType
     {
+        [Display(Name = "Receita")]
         Income,
+        [Display(Name = "Despesa")]
         Expense
     }
 }
