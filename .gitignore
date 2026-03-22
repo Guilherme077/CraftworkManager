@@ -484,3 +484,4 @@ $RECYCLE.BIN/
 *.swp
 CraftworkManager/appsettings.json
 CraftworkManager/appsettings.json
+/CraftworkManager/appsettings.json
