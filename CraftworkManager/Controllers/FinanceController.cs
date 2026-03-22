@@ -104,5 +104,24 @@ namespace CraftworkManager.Controllers
             };
             return View(incomeTemplate);
         }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AddTransaction(Transaction transaction)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            transaction.UserId = userId;
+            if (transaction.ShipmentId.HasValue)
+            {
+                var shipment = await DbContext.Shipments.Include(s => s.Order).FirstOrDefaultAsync(s => s.Id == transaction.ShipmentId.Value);
+                if (shipment.Order.userId != userId)
+                {
+                    return BadRequest("Invalid shipment selected.");
+                }
+            }
+            DbContext.Transactions.Add(transaction);
+            await DbContext.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
     }
 }
