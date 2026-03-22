@@ -44,7 +44,7 @@ namespace CraftworkManager.Controllers
                 .ToListAsync();
 
             var shipmentsWithoutIncome = await DbContext.Shipments
-                .Where(s => s.Status != ShipmentStatus.Cancelled && !shipmentIds.Contains(s.Id) && s.Order.userId == userId)
+                .Where(s => s.Status != ShipmentStatus.Cancelled && !shipmentIds.Contains(s.Id) && (s.DeliveredOn.HasValue? s.DeliveredOn > DateTime.Today.AddDays(-14) : true) && s.Order.userId == userId)
                 .Include(s => s.Order)
                 .Include(s => s.Order.OrderItems)
                 .ThenInclude(oi => oi.BaseProduct)

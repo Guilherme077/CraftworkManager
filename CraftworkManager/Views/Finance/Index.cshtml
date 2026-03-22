@@ -9,7 +9,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Financeiro</h1>
         <div>
-            <a class="btn btn-primary" asp-controller="Finance" asp-action="AddIncome">Nova Transação</a>
+            <a class="btn btn-success" asp-controller="Finance" asp-action="AddIncome">Nova Receita</a>
+            <a class="btn btn-danger" asp-controller="Finance" asp-action="AddIncome">Nova Despesa</a>
             <a class="btn btn-outline-primary" asp-controller="Finance" asp-action="TransactionHistory">Histórico</a>
         </div>
     </div>
@@ -101,6 +102,7 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Envios sem receita vinculada</h5>
+                    <span class="text-sm-start">Não inclui envios concluídos a mais de 14 dias.</span>
                 </div>
                 <div class="card-body">
                     @if (Model.ShipmentsWithoutIncome.Any())

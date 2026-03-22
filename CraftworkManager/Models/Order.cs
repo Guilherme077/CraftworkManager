@@ -19,7 +19,7 @@ namespace CraftworkManager.Models
         public bool WithNF {  get; set; }
         public Payment PaymentWay { get; set; }
         public string ClientName { get; set; }
-        public string ClientAddress { get; set; }
+        public string? ClientAddress { get; set; }
         public string? Notes { get; set; }
         public decimal? Discount { get; set; }
         public decimal? Raise { get; set; }
