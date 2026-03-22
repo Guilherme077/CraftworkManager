@@ -36,6 +36,15 @@ namespace CraftworkManager.Models
             return $"{Order.getSmallDescription()} para {City}, {State}";
 
         }
+        public decimal getTotalPrice()
+        {
+            decimal orderTotal = Order.getTotalPrice();
+            if (ShippingCostIncludedOnPrice && ShippingCost.HasValue)
+            {
+                return orderTotal + ShippingCost.Value;
+            }
+            return orderTotal;
+        }
 
     }
 

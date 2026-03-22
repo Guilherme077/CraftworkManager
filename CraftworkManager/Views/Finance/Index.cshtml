@@ -113,6 +113,7 @@
                                         <th>Status</th>
                                         <th>Data do Pedido</th>
                                         <th>Cliente</th>
+                                        <th>Receita Estimada</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -127,6 +128,7 @@
                                             </td>
                                             <td>@shipment.Order.CreatedOn.ToString("dd/MM/yyyy")</td>
                                             <td>@shipment.Order.ClientName</td>
+                                            <td>@shipment.getTotalPrice()</td>
                                         </tr>
                                     }
                                 </tbody>
