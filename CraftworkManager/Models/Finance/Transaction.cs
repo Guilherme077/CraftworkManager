@@ -13,6 +13,7 @@ namespace CraftworkManager.Models.Finance
         public DateTime Date { get; set; }
         public TransactionType Type { get; set; }
         public bool Pending { get; set; }
+        public Guid? ShipmentId { get; set; }
         public Shipment? Shipment { get; set; }
 
         public decimal GetSignedAmount()

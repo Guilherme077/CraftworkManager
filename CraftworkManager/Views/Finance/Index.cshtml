@@ -9,8 +9,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Financeiro</h1>
         <div>
-            <a class="btn btn-primary" href="#" onclick="return false;">Nova Transação</a>
-            <a class="btn btn-outline-primary" href="#" onclick="return false;">Histórico</a>
+            <a class="btn btn-primary" asp-controller="Finance" asp-action="AddIncome">Nova Transação</a>
+            <a class="btn btn-outline-primary" asp-controller="Finance" asp-action="TransactionHistory">Histórico</a>
         </div>
     </div>
 
@@ -109,7 +109,7 @@
                             <table class="table table-sm">
                                 <thead>
                                     <tr>
-                                        <th>Código</th>
+                                        <th>Descrição</th>
                                         <th>Status</th>
                                         <th>Data do Pedido</th>
                                         <th>Cliente</th>
@@ -120,7 +120,7 @@
                                     @foreach (var shipment in Model.ShipmentsWithoutIncome)
                                     {
                                         <tr>
-                                            <td>@shipment.getDescription()</td>
+                                            <td><a asp-controller="Finance" asp-action="AddIncome" asp-route-shipmentId="@shipment.Id">@shipment.getDescription()</a></td>
                                             <td>
                                                 <span class="badge bg-info">
                                                     @shipment.Status.ToString()

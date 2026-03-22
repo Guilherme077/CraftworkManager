@@ -36,6 +36,11 @@ namespace CraftworkManager.Models
             return $"{Order.getSmallDescription()} para {City}, {State}";
 
         }
+        public string getFullDescription()
+        {
+            return $"{Order.getSmallDescription()} de {Order.ClientName} para {City}, {State}";
+
+        }
         public decimal getTotalPrice()
         {
             decimal orderTotal = Order.getTotalPrice();

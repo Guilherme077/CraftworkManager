@@ -3,6 +3,7 @@ using CraftworkManager.Models;
 using CraftworkManager.Models.Finance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -43,7 +44,7 @@ namespace CraftworkManager.Controllers
                 .ToListAsync();
 
             var shipmentsWithoutIncome = await DbContext.Shipments
-                .Where(s => s.Status != ShipmentStatus.Cancelled && !shipmentIds.Contains(s.Id))
+                .Where(s => s.Status != ShipmentStatus.Cancelled && !shipmentIds.Contains(s.Id) && s.Order.userId == userId)
                 .Include(s => s.Order)
                 .Include(s => s.Order.OrderItems)
                 .ThenInclude(oi => oi.BaseProduct)
@@ -70,6 +71,38 @@ namespace CraftworkManager.Controllers
         public IActionResult TransactionsHistory()
         {
             return View();
+        }
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> AddExpense()
+        {
+            return View();
+        }
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> AddIncome(Guid? shipmentId = null)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var shipment = await DbContext.Shipments.Where(s => s.Order.userId == userId).Include(s => s.Order).Include(s => s.Order.OrderItems).ThenInclude(oi => oi.BaseProduct).FirstOrDefaultAsync(s => s.Id == shipmentId);
+            var shipmentIds = await DbContext.Transactions
+                .Where(t => t.UserId == userId && t.Type == TransactionType.Income)
+                .Select(t => t.Shipment.Id)
+                .ToListAsync();
+
+            ViewBag.PendingShipments = DbContext.Shipments.Include(s => s.Order).Where(s => s.Order.userId == userId && s.Status != ShipmentStatus.Cancelled && !shipmentIds.Contains(s.Id)).Include(s => s.Order.OrderItems).ThenInclude(oi => oi.BaseProduct).Select(s => new SelectListItem
+            {
+                Value = s.Id.ToString(),
+                Text = s.getFullDescription()
+            });
+            var incomeTemplate = new Transaction()
+            {
+                Shipment = shipment,
+                ShipmentId = shipmentId,
+                Type = TransactionType.Income,
+                Date = DateTime.Now,
+                Amount = shipment != null ? shipment.getTotalPrice() : 0
+            };
+            return View(incomeTemplate);
         }
     }
 }
