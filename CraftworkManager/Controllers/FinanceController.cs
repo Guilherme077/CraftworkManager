@@ -39,8 +39,8 @@ namespace CraftworkManager.Controllers
                 .ToList();
 
             var shipmentIds = await DbContext.Transactions
-                .Where(t => t.UserId == userId && t.Type == TransactionType.Income)
-                .Select(t => t.Shipment.Id)
+                .Where(t => t.UserId == userId && t.Type == TransactionType.Income && t.ShipmentId.HasValue)
+                .Select(t => t.ShipmentId.Value)
                 .ToListAsync();
 
             var shipmentsWithoutIncome = await DbContext.Shipments
@@ -85,8 +85,8 @@ namespace CraftworkManager.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var shipment = await DbContext.Shipments.Where(s => s.Order.userId == userId).Include(s => s.Order).Include(s => s.Order.OrderItems).ThenInclude(oi => oi.BaseProduct).FirstOrDefaultAsync(s => s.Id == shipmentId);
             var shipmentIds = await DbContext.Transactions
-                .Where(t => t.UserId == userId && t.Type == TransactionType.Income)
-                .Select(t => t.Shipment.Id)
+                .Where(t => t.UserId == userId && t.Type == TransactionType.Income && t.ShipmentId.HasValue)
+                .Select(t => t.ShipmentId)
                 .ToListAsync();
 
             ViewBag.PendingShipments = DbContext.Shipments.Include(s => s.Order).Where(s => s.Order.userId == userId && s.Status != ShipmentStatus.Cancelled && !shipmentIds.Contains(s.Id)).Include(s => s.Order.OrderItems).ThenInclude(oi => oi.BaseProduct).Select(s => new SelectListItem
