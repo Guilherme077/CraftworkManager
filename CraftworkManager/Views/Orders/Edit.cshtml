@@ -109,24 +109,22 @@ else
                         }
                     </div>
                 </div>
-
-                <div class="card shadow-sm">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-sticky me-2"></i>Notas do Pedido
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="post">
-                            <textarea id="notes" name="notes" rows="6" class="form-control" placeholder="Digite notas do pedido aqui..." asp-for="Notes"></textarea>
-                            <small class="text-muted d-block mt-2">Use este campo para adicionar informações importantes sobre o pedido, instruções especiais ou observações gerais.</small>
-                        </form>
-                    </div>
-                </div>
             </div>
 
             <div class="col-lg-4">
                 <form method="post">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-sticky me-2"></i>Notas do Pedido
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <textarea id="notes" name="notes" rows="6" class="form-control" placeholder="Digite notas do pedido aqui..." asp-for="Notes"></textarea>
+                            <small class="text-muted d-block mt-2">Use este campo para adicionar informações importantes sobre o pedido, instruções especiais ou observações gerais.</small>
+
+                        </div>
+                    </div>
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-info text-white">
                             <h5 class="card-title mb-0">
