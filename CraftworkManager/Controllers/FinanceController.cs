@@ -76,8 +76,14 @@ namespace CraftworkManager.Controllers
         [HttpGet]
         public async Task<IActionResult> AddExpense()
         {
-            return View();
+            Transaction expenseTemplate = new Transaction()
+            {
+                Type = TransactionType.Expense,
+                Date = DateTime.Now
+            };
+            return View(expenseTemplate);
         }
+
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> AddIncome(Guid? shipmentId = null)
