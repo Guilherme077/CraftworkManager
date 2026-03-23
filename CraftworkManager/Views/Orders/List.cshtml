@@ -1,92 +1,187 @@
 ﻿@using System.ComponentModel.DataAnnotations
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
 @{
     ViewData["Title"] = "Pedidos";
 }
 
 @model List<CraftworkManager.Models.Order>
 
-<h1>Todos os Pedidos Abertos</h1>
-<span>A lista não inclui pedidos enviados ou cancelados.</span>
-<a asp-controller="Orders" asp-action="Add" class="btn btn-primary">Novo Pedido</a>
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <h1 class="mb-2">
+                <i class="bi bi-list-check me-2"></i>Pedidos Abertos
+            </h1>
+        </div>
+        <div class="col-lg-4 d-flex align-items-center justify-content-lg-end">
+            <a asp-controller="Orders" asp-action="Add" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle me-2"></i>Novo Pedido
+            </a>
+        </div>
+    </div>
 
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            Nenhum pedido aberto no momento.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var order in Model)
+            {
+                var statusName = order.Status.GetAttribute<DisplayAttribute>();
+                var statusBadgeClass = order.Status switch
+                {
+                    OrderStatus.Pending => "bg-info",
+                    OrderStatus.InProduction => "bg-warning",
+                    OrderStatus.Paused => "bg-secondary",
+                    OrderStatus.ReadyToShip => "bg-success",
+                    OrderStatus.Shipped => "bg-primary",
+                    OrderStatus.Cancelled => "bg-danger",
+                    _ => "bg-dark"
+                };
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Status</th>
-            <th>Descrição</th>
-            <th>Data do Pedido</th>
-            <th>Prazo</th>
-            <th>Cliente</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var order in Model)
-        {
-            var statusName = order.Status.GetAttribute<DisplayAttribute>();
-            <tr>
-                <td>@statusName.Name</td>
-                <td>@order.getSmallDescription()</td>
-                <td>@order.CreatedOn.ToString("dd/MM/yyyy")</td>
-                <td>@order.DeadlineOn.Value.ToString("dd/MM/yyyy")</td>
-                <td>@order.ClientName</td>
-                <td>
-                    <a class="btn btn-primary" asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id">Visualizar</a>
-                    
-                    @if (order.Status == OrderStatus.InProduction)
-                    {
-                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@order.Id" />
-                            <input type="hidden" name="status" value="@OrderStatus.Paused" />
-                            <button type="submit" class="btn btn-warning">Pausar</button>
-                        </form>
-                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@order.Id" />
-                            <input type="hidden" name="status" value="@OrderStatus.ReadyToShip" />
-                            <button type="submit" class="btn btn-success">Finalizar Produção</button>
-                        </form>
-                    }
-                    @if (order.Status == OrderStatus.Pending)
-                    {
-                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@order.Id" />
-                            <input type="hidden" name="status" value="@OrderStatus.InProduction" />
-                            <button type="submit" class="btn btn-success">Enviar para Produção</button>
-                        </form>
-                    }
-                    @if (order.Status == OrderStatus.ReadyToShip)
-                    {
-                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@order.Id" />
-                            <input type="hidden" name="status" value="@OrderStatus.Shipped" />
-                            <button type="submit" class="btn btn-success">Enviar Pedido</button>
-                        </form>
-                    }
-                    @if (order.Status == OrderStatus.Paused)
-                    {
-                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@order.Id" />
-                            <input type="hidden" name="status" value="@OrderStatus.InProduction" />
-                            <button type="submit" class="btn btn-success">Enviar para Produção</button>
-                        </form>
-                        <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@order.Id" />
-                            <input type="hidden" name="status" value="@OrderStatus.Pending" />
-                            <button type="submit" class="btn btn-success">Tornar Pendente</button>
-                        </form>
-                    }
+                var statusIcon = order.Status switch
+                {
+                    OrderStatus.Pending => "clock",
+                    OrderStatus.InProduction => "hammer",
+                    OrderStatus.Paused => "pause-circle",
+                    OrderStatus.ReadyToShip => "check-circle",
+                    OrderStatus.Shipped => "truck",
+                    OrderStatus.Cancelled => "x-circle",
+                    _ => "question-circle"
+                };
 
-                    <form asp-controller="Orders" asp-action="ChangeStatus" method="post" style="display:inline;">
-                        <input type="hidden" name="id" value="@order.Id" />
-                        <input type="hidden" name="status" value="@OrderStatus.Cancelled" />
-                        <button type="submit" class="btn btn-danger">Cancelar</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header @statusBadgeClass text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-@statusIcon me-2"></i>@statusName.Name
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Cliente</small>
+                                <strong>@order.ClientName</strong>
+                            </div>
+
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Descrição</small>
+                                <p class="mb-0">@order.getSmallDescription()</p>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Data do Pedido</small>
+                                    <strong>@order.CreatedOn.ToString("dd/MM/yyyy")</strong>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Prazo</small>
+                                    <strong class="@(order.DeadlineOn < DateTime.Now ? "text-danger" : (order.DeadlineOn < DateTime.Today.AddDays(7) ? "text-warning" : ""))">
+                                        @order.DeadlineOn.Value.ToString("dd/MM/yyyy")
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <a asp-controller="Orders" asp-action="Edit" asp-route-id="@order.Id" class="btn btn-outline-primary btn-sm w-100 mb-3">
+                                <i class="bi bi-eye me-1"></i>Visualizar Detalhes
+                            </a>
+                        </div>
+
+                        <div class="card-footer bg-light">
+                            <div class="d-grid gap-2">
+                                @if (order.Status == OrderStatus.Pending)
+                                {
+                                    <form asp-controller="Orders" asp-action="ChangeStatus" method="post" class="mb-2">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="status" value="@OrderStatus.InProduction" />
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="bi bi-play-circle me-1"></i>Enviar para Produção
+                                        </button>
+                                    </form>
+                                    <form asp-controller="Orders" asp-action="ChangeStatus" method="post">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="status" value="@OrderStatus.Cancelled" />
+                                        <button type="submit" class="btn btn-danger btn-sm w-100">
+                                            <i class="bi bi-trash me-1"></i>Cancelar
+                                        </button>
+                                    </form>
+                                }
+                                @if (order.Status == OrderStatus.InProduction)
+                                {
+                                    <form asp-controller="Orders" asp-action="ChangeStatus" method="post" class="mb-2">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="status" value="@OrderStatus.Paused" />
+                                        <button type="submit" class="btn btn-warning btn-sm w-100">
+                                            <i class="bi bi-pause-circle me-1"></i>Pausar
+                                        </button>
+                                    </form>
+                                    <form asp-controller="Orders" asp-action="ChangeStatus" method="post" class="mb-2">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="status" value="@OrderStatus.ReadyToShip" />
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="bi bi-check-circle me-1"></i>Finalizar Produção
+                                        </button>
+                                    </form>
+                                    <form asp-controller="Orders" asp-action="ChangeStatus" method="post">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="status" value="@OrderStatus.Cancelled" />
+                                        <button type="submit" class="btn btn-danger btn-sm w-100">
+                                            <i class="bi bi-trash me-1"></i>Cancelar
+                                        </button>
+                                    </form>
+                                }
+                                @if (order.Status == OrderStatus.Paused)
+                                {
+                                    <form asp-controller="Orders" asp-action="ChangeStatus" method="post" class="mb-2">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="status" value="@OrderStatus.InProduction" />
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="bi bi-play-circle me-1"></i>Retomar Produção
+                                        </button>
+                                    </form>
+                                    <form asp-controller="Orders" asp-action="ChangeStatus" method="post">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="status" value="@OrderStatus.Cancelled" />
+                                        <button type="submit" class="btn btn-danger btn-sm w-100">
+                                            <i class="bi bi-trash me-1"></i>Cancelar
+                                        </button>
+                                    </form>
+                                }
+                                @if (order.Status == OrderStatus.ReadyToShip)
+                                {
+                                    <div class="alert alert-info mb-0" role="alert">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        <small>Pronto para envio. O controle do status do pedido é feito pelo seu Envio.</small>
+                                    </div>
+                                }
+                                @if (order.Status == OrderStatus.Shipped)
+                                {
+                                    <div class="alert alert-success mb-0" role="alert">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        <small>Pedido enviado. Sem ações disponíveis.</small>
+                                    </div>
+                                }
+                                @if (order.Status == OrderStatus.Cancelled)
+                                {
+                                    <form asp-controller="Orders" asp-action="ChangeStatus" method="post" class="mb-2">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="status" value="@OrderStatus.InProduction" />
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="bi bi-arrow-clockwise me-1"></i>Reativar para Produção
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
