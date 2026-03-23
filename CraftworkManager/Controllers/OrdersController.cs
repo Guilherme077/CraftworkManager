@@ -79,8 +79,7 @@ namespace CraftworkManager.Controllers
                 order.LastUpdateOn = DateTime.Now;
 
                 await DbContext.SaveChangesAsync();
-                _toast.AddInfoToastMessage("Pedido editado!\nPreço do Pedido: R$" + order.getTotalPrice());
-                return RedirectToAction("List");
+                _toast.AddInfoToastMessage("Pedido editado! Preço do Pedido: R$" + order.getTotalPrice());
             }
 
             return RedirectToAction("Edit", "Orders", new { id = order.Id });
