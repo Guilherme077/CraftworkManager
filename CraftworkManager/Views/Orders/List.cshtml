@@ -157,7 +157,7 @@
                                 {
                                     <div class="alert alert-info mb-0" role="alert">
                                         <i class="bi bi-info-circle me-1"></i>
-                                        <small>Pronto para envio. O controle do status do pedido é feito pelo seu Envio.</small>
+                                        <small>Pronto para envio. O controle do status do pedido é feito pelo seu <a asp-controller="Shipments" asp-action="Index">Envio</a>.</small>
                                     </div>
                                 }
                                 @if (order.Status == OrderStatus.Shipped)

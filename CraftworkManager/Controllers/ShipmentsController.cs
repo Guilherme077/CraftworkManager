@@ -89,11 +89,17 @@ namespace CraftworkManager.Controllers
                 if (status == ShipmentStatus.Shipped)
                 {
                     shipment.ShippedOn = DateTime.Now;
+                    shipment.Order.Status = OrderStatus.Shipped;
                     await DbContext.SaveChangesAsync();
                     return RedirectToAction("Edit", new { id = id });
                 }
                 else if (status == ShipmentStatus.Delivered)
                     shipment.DeliveredOn = DateTime.Now;
+                else if (status == ShipmentStatus.Cancelled)
+                    shipment.Order.Status = OrderStatus.Cancelled;
+                else if (status == ShipmentStatus.Failed || status == ShipmentStatus.Returned)
+                    shipment.Order.Status = OrderStatus.ReadyToShip;
+       
                 await DbContext.SaveChangesAsync();
                 _toast.AddSuccessToastMessage("Status atualizado!");
             }
