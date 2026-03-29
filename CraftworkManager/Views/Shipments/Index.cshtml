@@ -1,65 +1,128 @@
 ﻿@using System.ComponentModel.DataAnnotations
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
 @{
     ViewData["Title"] = "Envios";
 }
 
 @model List<CraftworkManager.Models.Shipment>
 
-<h1>Todos os Envios Pendentes ou Enviados</h1>
-<span>A lista não inclui envios concluídos ou cancelados.</span>
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <h1 class="mb-2">
+                <i class="bi bi-truck me-2"></i>Todos os Envios
+            </h1>
+        </div>
+    </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Status</th>
-            <th>Código de Rastreio</th>
-            <th>Transportadora</th>
-            <th>Pedido</th>
-            <th>Cliente</th>
-            <th>Prazo do Pedido</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var shipment in Model)
-        {
-            var statusName = shipment.Status.GetAttribute<DisplayAttribute>();
-            <tr>
-                <td>@statusName.Name</td>
-                <td>@shipment.TrackingCode</td>
-                <td>@shipment.TransportCompany</td>
-                <td>@shipment.Order.getSmallDescription()</td>
-                <td>@shipment.Order.ClientName</td>
-                <td>@shipment.Order.DeadlineOn.Value.ToString("dd/MM/yyyy")</td>
-                <td>
-                    <a class="btn btn-primary" asp-controller="Shipments" asp-action="Edit" asp-route-id="@shipment.Id">Editar</a>
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            Nenhum envio no momento.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var shipment in Model)
+            {
+                var statusName = shipment.Status.GetAttribute<DisplayAttribute>();
+                var statusBadgeClass = shipment.Status switch
+                {
+                    ShipmentStatus.Pending => "bg-warning",
+                    ShipmentStatus.Shipped => "bg-info",
+                    ShipmentStatus.Delivered => "bg-success",
+                    ShipmentStatus.Cancelled => "bg-danger",
+                    _ => "bg-dark"
+                };
 
-                    @if (shipment.Status == ShipmentStatus.Pending)
-                    {
-                        <form asp-controller="Shipments" asp-action="ChangeStatus" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@shipment.Id" />
-                            <input type="hidden" name="status" value="@ShipmentStatus.Shipped" />
-                            <button type="submit" class="btn btn-success">Marcar como Enviado</button>
-                        </form>
-                    }
-                    @if (shipment.Status == ShipmentStatus.Shipped)
-                    {
-                        <form asp-controller="Shipments" asp-action="ChangeStatus" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@shipment.Id" />
-                            <input type="hidden" name="status" value="@ShipmentStatus.Delivered" />
-                            <button type="submit" class="btn btn-success">Marcar como Entregue</button>
-                        </form>
-                    }
-                    <form asp-controller="Shipments" asp-action="ChangeStatus" method="post" style="display:inline;">
-                        <input type="hidden" name="id" value="@shipment.Id" />
-                        <input type="hidden" name="status" value="@ShipmentStatus.Cancelled" />
-                        <button type="submit" class="btn btn-danger">Cancelar</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                var statusIcon = shipment.Status switch
+                {
+                    ShipmentStatus.Pending => "clock",
+                    ShipmentStatus.Shipped => "truck",
+                    ShipmentStatus.Delivered => "check-circle",
+                    ShipmentStatus.Cancelled => "x-circle",
+                    _ => "question-circle"
+                };
+
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header @statusBadgeClass text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-@statusIcon me-2"></i>@statusName.Name
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Cliente</small>
+                                <strong>@shipment.Order.ClientName</strong>
+                            </div>
+
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Descrição do Pedido</small>
+                                <p class="mb-0">@shipment.Order.getSmallDescription()</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Código de Rastreio</small>
+                                <code class="bg-light p-2 d-block">@shipment.TrackingCode</code>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Transportadora</small>
+                                    <strong>@shipment.TransportCompany</strong>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Prazo do Pedido</small>
+                                    <strong class="@(shipment.Order.DeadlineOn < DateTime.Now ? "text-danger" : (shipment.Order.DeadlineOn < DateTime.Today.AddDays(7) ? "text-warning" : ""))">
+                                        @shipment.Order.DeadlineOn.Value.ToString("dd/MM/yyyy")
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <a asp-controller="Shipments" asp-action="Edit" asp-route-id="@shipment.Id" class="btn btn-outline-primary btn-sm w-100 mb-3">
+                                <i class="bi bi-pencil me-1"></i>Editar
+                            </a>
+                        </div>
+
+                        <div class="card-footer bg-light">
+                            <div class="d-grid gap-2">
+                                @if (shipment.Status == ShipmentStatus.Pending)
+                                {
+                                    <form asp-controller="Shipments" asp-action="ChangeStatus" method="post" class="mb-2">
+                                        <input type="hidden" name="id" value="@shipment.Id" />
+                                        <input type="hidden" name="status" value="@ShipmentStatus.Shipped" />
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="bi bi-truck me-1"></i>Marcar como Enviado
+                                        </button>
+                                    </form>
+                                }
+                                @if (shipment.Status == ShipmentStatus.Shipped)
+                                {
+                                    <form asp-controller="Shipments" asp-action="ChangeStatus" method="post" class="mb-2">
+                                        <input type="hidden" name="id" value="@shipment.Id" />
+                                        <input type="hidden" name="status" value="@ShipmentStatus.Delivered" />
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="bi bi-check-circle me-1"></i>Marcar como Entregue
+                                        </button>
+                                    </form>
+                                }
+                                <form asp-controller="Shipments" asp-action="ChangeStatus" method="post">
+                                    <input type="hidden" name="id" value="@shipment.Id" />
+                                    <input type="hidden" name="status" value="@ShipmentStatus.Cancelled" />
+                                    <button type="submit" class="btn btn-danger btn-sm w-100">
+                                        <i class="bi bi-trash me-1"></i>Cancelar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

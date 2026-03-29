@@ -102,6 +102,7 @@ namespace CraftworkManager.Controllers
             });
             var incomeTemplate = new Transaction()
             {
+                Description = shipment != null ? $"Venda de {shipment.Order.getSmallDescription()} para {shipment.Order.ClientName}" : "",
                 Shipment = shipment,
                 ShipmentId = shipmentId,
                 Type = TransactionType.Income,
