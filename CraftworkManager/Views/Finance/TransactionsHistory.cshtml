@@ -1,0 +1,103 @@
+﻿@using System.ComponentModel.DataAnnotations
+@model List<CraftworkManager.Models.Finance.Transaction>
+
+@{
+    ViewData["Title"] = "Histórico de Transações";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Histórico de Transações</h1>
+        <div>
+            <a class="btn btn-success" asp-controller="Finance" asp-action="AddIncome">Nova Receita</a>
+            <a class="btn btn-danger" asp-controller="Finance" asp-action="AddExpense">Nova Despesa</a>
+            <a class="btn btn-outline-secondary" asp-controller="Finance" asp-action="Index">Voltar</a>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Todas as Transações</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var transaction in Model.OrderByDescending(t => t.Date))
+                            {
+                                var typeName = transaction.Type.GetAttribute<DisplayAttribute>();
+                                var isIncome = transaction.Type == CraftworkManager.Models.Finance.TransactionType.Income;
+
+                                <tr>
+                                    <td>
+                                        <strong>@transaction.Date.ToString("dd/MM/yyyy")</strong>
+                                        <br />
+                                        <small class="text-muted">@transaction.Date.ToString("HH:mm")</small>
+                                    </td>
+                                    <td>
+                                        @transaction.Description
+                                    </td>
+                                    <td>
+                                        <span class="badge @(isIncome ? "bg-success" : "bg-danger")">
+                                            @typeName.Name
+                                        </span>
+                                    </td>
+                                    <td class="@(isIncome ? "text-success fw-bold" : "text-danger fw-bold")">
+                                        @(isIncome ? "+" : "-")@transaction.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))
+                                    </td>
+                                    <td>
+                                        @if (transaction.Pending)
+                                        {
+                                            <span class="badge bg-warning text-dark">Pendente</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">Confirmada</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("EditTransaction", "Finance", new { id = transaction.Id })" class="btn btn-sm btn-outline-primary">
+                                            Editar Transação
+                                        </a>
+                                        @if (transaction.Pending)
+                                        {
+                                            <a href="@Url.Action("TransactionNotPending", "Finance", new { id = transaction.Id })" class="btn btn-sm btn-outline-primary">
+                                                Marcar como Pago
+                                            </a>
+                                        }
+                                        
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">Nenhuma transação registrada</h4>
+            <p>Você ainda não tem nenhuma transação no sistema.</p>
+            <hr />
+            <div class="d-flex gap-2">
+                <a class="btn btn-success" asp-controller="Finance" asp-action="AddIncome">Adicionar Receita</a>
+                <a class="btn btn-danger" asp-controller="Finance" asp-action="AddExpense">Adicionar Despesa</a>
+            </div>
+        </div>
+    }
+</div>

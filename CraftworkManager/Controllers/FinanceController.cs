@@ -68,9 +68,11 @@ namespace CraftworkManager.Controllers
 
         [Authorize]
         [HttpGet]
-        public IActionResult TransactionsHistory()
+        public async Task<IActionResult> TransactionsHistory()
         {
-            return View();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var transactions = await DbContext.Transactions.Where(t => t.UserId == userId).Include(t => t.Shipment).ThenInclude(s => s.Order).ToListAsync();
+            return View(transactions);
         }
         [Authorize]
         [HttpGet]
