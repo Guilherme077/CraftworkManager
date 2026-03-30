@@ -1,5 +1,7 @@
 ﻿using CraftworkManager.Data;
 using CraftworkManager.Models;
+using CraftworkManager.Models.Logs;
+using CraftworkManager.Models.LogsModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using static NuGet.Packaging.PackagingConstants;
 
 namespace CraftworkManager.Controllers
 {
@@ -36,6 +37,18 @@ namespace CraftworkManager.Controllers
             };
 
             await DbContext.Orders.AddAsync(order);
+
+            var OrderHistory = new OrderStatusHistory
+            {
+                Order = order,
+                OrderId = order.Id,
+                ChangedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                ModificationType = ModificationType.Created,
+                Status = order.Status,
+                ChangedOn = DateTime.Now
+            };
+
+            await DbContext.OrderStatusHistory.AddAsync(OrderHistory);
             await DbContext.SaveChangesAsync();
             return RedirectToAction("Edit", "Orders", new { id = order.Id });
         }
@@ -220,6 +233,16 @@ namespace CraftworkManager.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var order = await DbContext.Orders.Where(p => p.userId == userId).FirstOrDefaultAsync(o => o.Id == id);
             order.Status = status;
+            var OrderHistory = new OrderStatusHistory
+            {
+                Order = order,
+                OrderId = order.Id,
+                ChangedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                ModificationType = ModificationType.StatusChanged,
+                Status = order.Status,
+                ChangedOn = DateTime.Now
+            };
+            await DbContext.OrderStatusHistory.AddAsync(OrderHistory);
             await DbContext.SaveChangesAsync();
             
             if (status == OrderStatus.ReadyToShip)
