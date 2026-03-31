@@ -1,11 +1,12 @@
 ﻿using CraftworkManager.Data;
 using CraftworkManager.Models;
+using CraftworkManager.Models.Logs;
+using CraftworkManager.Models.LogsModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace CraftworkManager.Controllers
 {
@@ -36,6 +37,17 @@ namespace CraftworkManager.Controllers
                 Status = ShipmentStatus.Pending
             };
             await DbContext.Shipments.AddAsync(shipment);
+
+            var shipmentHistory = new ShipmentStatusHistory
+            {
+                Shipment = shipment,
+                ShipmentId = shipment.Id,
+                ChangedByUserId = userId,
+                ModificationType = ModificationType.Created,
+                Status = shipment.Status,
+                ChangedOn = DateTime.Now
+            };
+            await DbContext.ShipmentStatusHistory.AddAsync(shipmentHistory);
             await DbContext.SaveChangesAsync();
             return RedirectToAction("Edit", "Shipments", new { id = shipment.Id });
         }
@@ -99,7 +111,33 @@ namespace CraftworkManager.Controllers
                     shipment.Order.Status = OrderStatus.Cancelled;
                 else if (status == ShipmentStatus.Failed || status == ShipmentStatus.Returned)
                     shipment.Order.Status = OrderStatus.ReadyToShip;
-       
+
+                var shipmentHistory = new ShipmentStatusHistory
+                {
+                    Shipment = shipment,
+                    ShipmentId = shipment.Id,
+                    ChangedByUserId = userId,
+                    ModificationType = ModificationType.StatusChanged,
+                    Status = shipment.Status,
+                    ChangedOn = DateTime.Now
+                };
+                await DbContext.ShipmentStatusHistory.AddAsync(shipmentHistory);
+
+                ////Refactor to create order and shipment logs in separeted functions and call them in the right places, to avoid code repetition and make it more organized
+                //if (status == ShipmentStatus.Shipped || status == ShipmentStatus.Cancelled || status == ShipmentStatus.Failed || status == ShipmentStatus.Returned)
+                //{
+                //    var OrderHistory = new OrderStatusHistory
+                //    {
+                //        Order = shipment.Order,
+                //        OrderId = shipment.Order.Id,
+                //        ChangedByUserId = userId,
+                //        ModificationType = ModificationType.StatusChanged,
+                //        Status = shipment.Order.Status,
+                //        ChangedOn = DateTime.Now
+                //    };
+                //    await DbContext.OrderStatusHistory.AddAsync(OrderHistory);
+                //}
+
                 await DbContext.SaveChangesAsync();
                 _toast.AddSuccessToastMessage("Status atualizado!");
             }
