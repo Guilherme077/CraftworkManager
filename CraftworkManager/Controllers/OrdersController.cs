@@ -68,6 +68,8 @@ namespace CraftworkManager.Controllers
                 Text = s.GetAttribute<DisplayAttribute>().Name
             });
 
+            ViewBag.StatusHistory = await DbContext.OrderStatusHistory.Where(h => h.OrderId == id).Include(h => h.Order).OrderByDescending(h => h.ChangedOn).ToListAsync();
+
             return View(order);
         }
         [Authorize]

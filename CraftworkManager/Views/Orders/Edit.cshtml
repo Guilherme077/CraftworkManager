@@ -1,4 +1,5 @@
 ﻿@using System.ComponentModel.DataAnnotations
+@using CraftworkManager.Models.LogsModels
 @{
 }
 
@@ -107,6 +108,61 @@ else
                                 </table>
                             </div>
                         }
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="card-title mb-0">Linha do Tempo</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            @foreach(var log in ViewBag.StatusHistory)
+                            {
+                                var bgColor = log.ModificationType switch
+                                {
+                                    ModificationType.StatusChanged => log.Status switch
+                                    {
+                                        OrderStatus.Pending => "info",
+                                        OrderStatus.InProduction => "warning",
+                                        OrderStatus.Paused => "secondary",
+                                        OrderStatus.ReadyToShip => "success",
+                                        OrderStatus.Shipped => "primary",
+                                        OrderStatus.Cancelled => "danger",
+                                        _ => "dark"
+                                    },
+                                    ModificationType.Created => "info",
+                                    ModificationType.Deleted => "danger",
+                                    _ => "info"
+                                };
+                                var statusIcon = log.ModificationType switch
+                                {
+                                    ModificationType.StatusChanged => log.Status switch
+                                    {
+                                        OrderStatus.Pending => "clock",
+                                        OrderStatus.InProduction => "hammer",
+                                        OrderStatus.Paused => "pause-circle",
+                                        OrderStatus.ReadyToShip => "check-circle",
+                                        OrderStatus.Shipped => "truck",
+                                        OrderStatus.Cancelled => "x-circle",
+                                        _ => "question-circle"
+                                    },
+                                    ModificationType.Created => "plus-circle",
+                                    ModificationType.Deleted => "trash",
+                                    _ => "question-circle"
+                                };
+                                var description = log.ModificationType == ModificationType.StatusChanged ? log.Status.ToString() : log.ModificationType.ToString();
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-@bgColor text-white">
+                                        <i class="bi bi-@statusIcon"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <span>@description</span>
+                                        <span class="ms-2 text-muted">@log.ChangedOn.ToString("dd/MM/yyyy HH:mm")</span>
+                                    </div>    
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
